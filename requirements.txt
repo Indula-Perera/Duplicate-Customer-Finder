@@ -3,3 +3,4 @@ geopy
 joblib
 pandas
 streamlit
+openpyxl
