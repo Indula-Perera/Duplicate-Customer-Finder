@@ -38,14 +38,17 @@ if uploaded_file:
     st.dataframe(df.head())
     
     if st.button("Find Duplicates"):
-        duplicates = []
-        for sector, group in df.groupby('SECTOR'):
-            sector_duplicates = Parallel(n_jobs=-1)(delayed(check_duplicates)(i, row1, group)
-                                                     for i, row1 in group.iterrows())
-            duplicates.extend([item for sublist in sector_duplicates for item in sublist])
+        with st.spinner("Processing, please wait..."):
+            duplicates = []
+            for sector, group in df.groupby('SECTOR'):
+                sector_duplicates = Parallel(n_jobs=-1)(delayed(check_duplicates)(i, row1, group)
+                                                         for i, row1 in group.iterrows())
+                duplicates.extend([item for sublist in sector_duplicates for item in sublist])
         
         if duplicates:
             duplicates_df = pd.concat(duplicates, ignore_index=True)
+            st.success("Duplicate check completed successfully!")
+            
             st.write("### Detected Duplicates")
             st.dataframe(duplicates_df.head())
             
@@ -61,4 +64,4 @@ if uploaded_file:
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
         else:
-            st.write("No duplicates found.")
+            st.success("Processing completed! No duplicates found.")
